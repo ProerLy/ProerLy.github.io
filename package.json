@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "deploy": "bash deploy.sh",
     "docs:dev": "vitepress dev doc",
     "docs:build": "vitepress build doc",
     "docs:preview": "vitepress preview doc"

@@ -1,0 +1,38 @@
+name: Deploy VitePress Site to GitHub Pages
+ 
+on:
+  push:
+    branches: [master]
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+ 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20  # 可根据项目需求选择合适的 Node.js 版本
+          cache: npm
+ 
+      # 清理缓存并重新安装依赖（解决依赖缺失或版本不一致问题）
+      - name: Clean npm cache and reinstall dependencies
+        run: |
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          npm install --force
+ 
+      - name: Build
+        run: npm run docs:build
+ 
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir:./.vitepress/dist  # VitePress 构建产物目录
+          keep_files: false
+          force_orphan: true
