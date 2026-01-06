@@ -31,5 +31,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           branch: main
-          folder: docs/.vitepress/dist
+          folder: doc/.vitepress/dist
           clean: true
