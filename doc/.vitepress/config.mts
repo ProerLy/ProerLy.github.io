@@ -16,15 +16,28 @@ export default defineConfig({
         text: "前端",
         items: [
           { text: "Js笔记", link: "/views/front-end/js" },
+          { text: "vuex", link: "/views/front-end/vuex" },
           {
-            text: "实例记录",
-            link: "/views/front-end/example",
+            text: "问题记录",
+            items: [
+              { text: "html", link: "/views/front-end/html-example" },
+              { text: "css", link: "/views/front-end/css-example" },
+              { text: "js", link: "/views/front-end/js-example" },
+              { text: "http", link: "/views/front-end/http-example" },
+              { text: "vue2", link: "/views/front-end/vue2-example" },
+              { text: "vue3", link: "/views/front-end/vue3-example" },
+              { text: "vite", link: "/views/front-end/vite-example" },
+            ],
           },
         ],
       },
       {
         text: "vitePress文档",
         link: "/views/vite-press",
+      },
+      {
+        text: "git",
+        link: "/views/git",
       },
     ],
 

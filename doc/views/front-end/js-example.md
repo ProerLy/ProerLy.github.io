@@ -116,3 +116,71 @@ async function demo() {
   }
 }
 ```
+
+## 监听某个元素是否出现在页面中 IntersectionObserver
+
+IntersectionObserver 是浏览器原生提供的一个 JavaScript API，用于异步监测元素与其祖先容器或视口（viewport）之间的交叉状态。‌ 它可以高效地判断元素是否进入可视区域、离开可视区域，或发生部分重叠，而无需频繁监听滚动事件，从而提升性能。‌
+
+1. ‌ 创建观察器实例 ‌：
+
+```javascript
+const observer = new IntersectionObserver(callback, options);
+```
+
+- callback：状态变化时的回调函数，接收 entries（包含交叉状态信息）和 observer 实例。
+- options：配置对象，常用参数包括：
+
+  - root：根元素（默认为视口）。
+  - threshold：阈值数组（如 [0, 0.5, 1] 表示元素可见比例达到 0%、50%、100%时触发
+
+2. 开始/停止监听 ‌：
+
+- observer.observe(element)：开始监听目标元素。
+- observer.unobserve(element)：停止监听。
+- observer.disconnect()：关闭观察器。‌
+
+```javascript
+// 创建观察器实例
+const observer = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        // 显示 做什么……
+      } else {
+        // 隐藏 做什么……
+      }
+    });
+  },
+  {
+    threshold: 0.1, // 元素有10%进入视口时触发
+  }
+);
+
+// 开始观察目标元素
+observer.observe(document.querySelector(".g-1"));
+```
+
+注意事项
+
+- 根元素设置 ‌：若观察容器非视口，需通过 `options.root` 指定滚动容器。‌
+- ‌ 阈值选择 ‌：根据需求设置阈值，例如动画触发常用 0.1（元素 10%可见时触发）。‌
+- ‌ 资源清理 ‌：使用完毕后调用 `observer.disconnect()` 避免内存泄漏。‌
+  通过 `IntersectionObserver`，可以高效实现复杂的滚动交互，显著提升页面性能与用户体验。‌
+
+## 图片懒加载
+
+```javascript
+// 监听所有带有 lazyload 类的图片
+const imgList = document.querySelectorAll("img.lazyload");
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry) => {
+    if (entry.isIntersecting) {
+      const img = entry.target;
+      img.src = img.dataset.src; // 加载真实图片
+      observer.unobserve(img);
+    }
+  });
+});
+
+imgList.forEach((img) => observer.observe(img));
+```
