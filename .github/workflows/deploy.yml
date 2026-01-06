@@ -2,7 +2,7 @@ name: Deploy VitePress Site to GitHub Pages
 
 on:
   push:
-    branches: [main] # 当 main 分支有更新时触发
+    branches: [main]
 
 jobs:
   deploy:
@@ -11,20 +11,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # 获取完整历史（可选）
+          fetch-depth: 0
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "18"
-          cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Build VitePress site
         run: npm run docs:build
-        # 或 npx vitepress build docs
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
