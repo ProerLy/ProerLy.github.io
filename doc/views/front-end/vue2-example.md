@@ -11,37 +11,45 @@
 ‌ 修改 `vue.config.js`：
 
 ```javascript
-const CompressionWebpackPlugin = require("compression-webpack-plugin");
 const path = require("path");
 // 判断是否为“需要哈希 + 压缩”的环境
 // 即：不是 development（包括 production / test / staging 等）
-const isBuildMode = process.env.NODE_ENV !== "development";
+const isBuilding =
+  process.env.NODE_ENV === "production" ||
+  (process.argv.includes("build") && !process.argv.includes("serve"));
 
 module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   transpileDependencies: ["element-ui", "ele-admin", "vue-i18n"],
+  filenameHashing: !isBuilding, // 注意：这里逻辑要小心
   chainWebpack: (config) => {
     // 删除 prefetch 预加载
     config.plugins.delete("prefetch");
-    if (isBuildMode) {
+    if (isBuilding) {
       // 🔧 1. 启用 contenthash 文件名（缓存 busting）
-      config.output
-        .filename("js/[name].[contenthash:8].js")
-        .chunkFilename("js/[name].[contenthash:8].chunk.js");
+      // 入口文件使用 contenthash
+      config.output.filename("js/[name].[contenthash:8].js");
+
+      // 异步 chunk（代码分割）也使用 contenthash
+      config.output.chunkFilename("js/[name].[contenthash:8].js");
+
+      // ✅✅ 添加 runtime chunk
+      config.optimization.runtimeChunk({
+        name: "runtime",
+      });
 
       // 🔧 2. 图片等静态资源也加 hash
       config.module
         .rule("images")
-        .test(/\.(png|jpe?g|gif|webp|svg)(\?.*)?$/)
         .use("url-loader")
-        .loader("url-loader")
         .tap((options) => ({
           ...options,
           name: "img/[name].[hash:8].[ext]",
         }));
 
       // 🔧 3. Gzip 压缩 >10KB 的文件
+      const CompressionWebpackPlugin = require("compression-webpack-plugin");
       config.plugin("compressionPlugin").use(
         new CompressionWebpackPlugin({
           test: /\.(js|css|html|txt)$/i, // 匹配的文件类型
