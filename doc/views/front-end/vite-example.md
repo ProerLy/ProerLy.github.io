@@ -12,6 +12,13 @@ import gzipPlugin from "rollup-plugin-gzip"; // ← 正确导入
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), ""); // 获取环境变量
   return {
+    build: {
+      minify: "esbuild",
+      target: "es2015",
+      esbuild: {
+        drop: ["console", "debugger"], // 删除 console.log
+      },
+    },
     css: {
       preprocessorOptions: {
         scss: {

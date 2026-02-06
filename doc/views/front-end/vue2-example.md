@@ -22,7 +22,7 @@ module.exports = {
   lintOnSave: false,
   productionSourceMap: false,
   transpileDependencies: ["element-ui", "ele-admin", "vue-i18n"],
-  filenameHashing: !isBuilding, // 注意：这里逻辑要小心
+  filenameHashing: isBuilding, // 注意：这里逻辑要小心
   chainWebpack: (config) => {
     // 删除 prefetch 预加载
     config.plugins.delete("prefetch");
@@ -56,7 +56,7 @@ module.exports = {
           threshold: 10240, // 超过 10KB 才压缩
           minRatio: 0.8, // 压缩率低于 0.8 才输出（可选）
           deleteOriginalAssets: false, // 不删除原始文件（保留 .js 和 .js.gz）
-        })
+        }),
       );
     }
   },
@@ -90,4 +90,91 @@ module.exports = {
     },
   },
 };
+```
+
+# Vue2 项目打包时将 console.log()和 debugger 去除的方法
+
+在 `vue.config.js` 中使用`terser-webpack-plugin` 的配置项：
+
+```javascript
+const path = require("path");
+// 判断是否为“需要哈希 + 压缩”的环境
+// 即：不是 development（包括 production / test / staging 等）
+const isBuilding =
+  process.env.NODE_ENV === "production" ||
+  (process.argv.includes("build") && !process.argv.includes("serve"));
+
+module.exports = {
+  chainWebpack: (config) => {
+    if (isBuilding) {
+      const TerserPlugin = require("terser-webpack-plugin");
+      // 安全地扩展 minimizer，而不是覆盖整个 optimization
+      if (!config.optimization) config.optimization = {};
+      const existingMinifiers = Array.isArray(config.optimization.minimizer)
+        ? config.optimization.minimizer
+        : [];
+      config.optimization.minimizer = [
+        ...existingMinifiers,
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+              drop_debugger: true,
+            },
+          },
+          parallel: true,
+          sourceMap: false,
+        }),
+      ];
+    }
+  },
+};
+```
+
+# Vue2 webpack 配置 解决内存不足问题的方法
+
+```javascript
+const path = require("path");
+// 判断是否为“需要哈希 + 压缩”的环境
+// 即：不是 development（包括 production / test / staging 等）
+const isBuilding =
+  process.env.NODE_ENV === "production" ||
+  (process.argv.includes("build") && !process.argv.includes("serve"));
+
+module.exports = {
+  chainWebpack: (config) => {
+    if (!isBuilding) {
+      // 启用文件系统缓存（大幅减少重复构建内存/CPU）
+      config.cache({
+        type: "filesystem", // 缓存类型
+        cacheDirectory: path.resolve(
+          __dirname,
+          "./node_modules/.cache/webpack",
+        ), // 缓存目录
+      });
+    }
+  },
+  // 或者
+  configureWebpack: {
+    cache: {
+      type: "filesystem", // 缓存类型
+      cacheDirectory: path.resolve(__dirname, "./node_modules/.cache/webpack"), // 缓存目录
+    },
+  },
+};
+```
+
+```javascript
+// 修改后的 scripts（推荐 4GB 内存）
+"scripts": {
+    "dev": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js serve",
+    "test": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js serve --open --mode test",
+    "build": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build",
+    "build:dev": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode development",
+    "build:test": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode test",
+    "build:prod": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode production",
+    "build:preview": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build --mode preview",
+    "build:report": "node --max-old-space-size=4096 node_modules/@vue/cli-service/bin/vue-cli-service.js build --report",
+    "lint": "vue-cli-service lint"
+  },
 ```
