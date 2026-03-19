@@ -32,6 +32,15 @@ export default defineConfig({
         ],
       },
       {
+        text: "后端",
+        items: [
+          {
+            text: "从零搭建 Express + Sequelize + MySQL 全栈 API 项目（含 Docker 部署 持续更新中……）",
+            link: "/views/back-end/node-express",
+          },
+        ],
+      },
+      {
         text: "vitePress文档",
         link: "/views/vite-press",
       },
