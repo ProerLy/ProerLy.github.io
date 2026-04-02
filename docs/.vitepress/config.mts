@@ -41,12 +41,14 @@ export default defineConfig({
         ],
       },
       {
-        text: "vitePress文档",
-        link: "/views/vite-press",
-      },
-      {
-        text: "git",
-        link: "/views/git",
+        text: "vitePress",
+        items: [
+          { text: "vitePress 文档", link: "/views/vite-press/plugins" },
+          {
+            text: "使用github pages 部署vitePress 文档",
+            link: "/views/vite-press/deploy",
+          },
+        ],
       },
     ],
 
