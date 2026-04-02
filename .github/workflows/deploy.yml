@@ -1,28 +1,32 @@
 # .github/workflows/deploy.yml
-name: Deploy VitePress to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
+  # 在 mine 分支有 push 或手动触发时运行
   push:
-    branches: [mine] # 或 master，根据你的主分支名
+    branches: [mine]
   workflow_dispatch:
 
+# 授予 GITHUB_TOKEN 权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# 允许取消正在进行的相同工作流
 concurrency:
-  group: pages
+  group: "pages"
   cancel-in-progress: true
 
 jobs:
+  # 构建任务
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0 # 获取所有历史记录以支持 last-updated
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -34,23 +38,38 @@ jobs:
         run: npm install
 
       - name: Build VitePress site
-        # 显式指定配置文件路径（适配 docs/vitepress/）
         run: |
           npm run docs:build
-          # 验证产物是否存在
-          ls -la docs/.vitepress/dist || echo "⚠️ dist not found!"
+          # 调试：打印出 dist 目录结构，确认构建成功
+          echo "=== Built files in docs/.vitepress/dist ==="
+          ls -la docs/.vitepress/dist/
+
+      - name: Copy dist files to root for User Site
+        run: |
+          # 清理根目录下可能存在的旧静态文件
+          # 注意：保留 .gitignore, package.json 等开发文件，它们不会被部署
+          rm -f *.html *.css *.js favicon.ico
+          rm -rf assets/ public/ images/ 
+
+          # 将构建产物从 docs/.vitepress/dist/ 复制到项目根目录
+          cp -r docs/.vitepress/dist/* .
+
+          # 调试：确认根目录现在有了网站文件
+          echo "=== Files in project root (to be deployed) ==="
+          ls -la
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/.vitepress/dist # ← 重点：你的实际路径！
+          path: ./ # 上传整个根目录，因为 User Site 必须从此处提供服务
 
+  # 部署任务
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

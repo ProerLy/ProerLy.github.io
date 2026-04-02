@@ -6,7 +6,7 @@ import {
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  base: "/ProerLy/ProerLy.github.io/",
+  base: "/",
   title: "熙熙的个人博客",
   description: "熙熙的个人博客",
   themeConfig: {
