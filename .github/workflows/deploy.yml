@@ -1,33 +1,57 @@
-name: Deploy VitePress Site to GitHub Pages
+# .github/workflows/deploy.yml
+name: Deploy VitePress to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [main] # 或 master，根据你的主分支名
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: 18
+          cache: npm
 
       - name: Install dependencies
         run: npm install
 
       - name: Build VitePress site
-        run: npm run docs:build
+        # 显式指定配置文件路径（适配 docs/vitepress/）
+        run: |
+          npm run docs:build
+          # 验证产物是否存在
+          ls -la docs/.vitepress/dist || echo "⚠️ dist not found!"
 
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          token: ${{ secrets.DEPLOY_TOKEN }}
-          branch: main
-          folder: doc/.vitepress/dist
-          clean: true
+          path: docs/.vitepress/dist # ← 重点：你的实际路径！
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
