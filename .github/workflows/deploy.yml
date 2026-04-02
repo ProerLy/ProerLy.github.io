@@ -39,24 +39,15 @@ jobs:
 
       - name: Build VitePress site
         run: |
-          npm run docs:build
-          # 调试：打印出 dist 目录结构，确认构建成功
-          echo "=== Built files in docs/.vitepress/dist ==="
-          ls -la docs/.vitepress/dist/
+          # 显式指定配置路径，避免歧义
+          npx vitepress build docs --config docs/vitepress/config.mts || \
+          npx vitepress build docs --config docs/.vitepress/config.mts
 
-      - name: Copy dist files to root for User Site
+      - name: Copy dist to root
         run: |
-          # 清理根目录下可能存在的旧静态文件
-          # 注意：保留 .gitignore, package.json 等开发文件，它们不会被部署
-          rm -f *.html *.css *.js favicon.ico
-          rm -rf assets/ public/ images/ 
-
-          # 将构建产物从 docs/.vitepress/dist/ 复制到项目根目录
-          cp -r docs/.vitepress/dist/* .
-
-          # 调试：确认根目录现在有了网站文件
-          echo "=== Files in project root (to be deployed) ==="
-          ls -la
+          mkdir -p temp-dist
+          cp -r docs/.vitepress/dist/* temp-dist/ || cp -r docs/vitepress/dist/* temp-dist/
+          rm -f *.html *.css *.js && cp -r temp-dist/* .
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
