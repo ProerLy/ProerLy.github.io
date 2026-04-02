@@ -196,7 +196,7 @@ server: {
 ```
 
 - **作用：在开发阶段（vite dev）代理 API 请求，绕过浏览器 CORS 限制。**
-  - 所有以 /api 开头的请求会被转发到 VITE_API_BASE（如 http://localhost:3000）。
+  - 所有以 /api 开头的请求会被转发到 VITE_API_BASE（如 `http://localhost:3000`）。
   - changeOrigin: true：确保 Host 头正确，适用于大多数后端服务。
 
 ### ✅ 8. 构建输出目录（按模式区分）

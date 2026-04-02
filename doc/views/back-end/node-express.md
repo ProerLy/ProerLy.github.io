@@ -44,7 +44,7 @@ npm i
 
 `npm start` 启动项目
 
-运行成功后，访问 http://localhost:3000/
+运行成功后，访问 `http://localhost:3000/`
 
 以下是成功安装后的目录结构
 
@@ -173,7 +173,7 @@ ccess /ALL
 npm i -g sequelize-cli
 ```
 
-2. 安装`sequelize`和`mysql2`，这个是`sequelize`中文文档 https://www.sequelize.cn/
+2. 安装`sequelize`和`mysql2`，这个是`sequelize`中文文档 `https://www.sequelize.cn/`
 
 ```bash
 npm i sequelize mysql2
