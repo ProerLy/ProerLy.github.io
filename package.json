@@ -1,0 +1,12 @@
+{
+  "scripts": {
+    "deploy": "bash deploy.sh",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.0.0",
+    "vitepress-plugin-group-icons": "^1.6.5"
+  }
+}
