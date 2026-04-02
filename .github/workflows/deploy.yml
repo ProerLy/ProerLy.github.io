@@ -3,7 +3,7 @@ name: Deploy VitePress to GitHub Pages
 
 on:
   push:
-    branches: [main] # 或 master，根据你的主分支名
+    branches: [mine] # 或 master，根据你的主分支名
   workflow_dispatch:
 
 permissions:
