@@ -6,18 +6,18 @@
 
 **前端在使用 video 标签播放视频时，出现 403 错误**
 
-<img src="/video403.png"/>
+<img src="/public/video403.png"/>
 
 **然而直接复制地址，在新窗口打开，却没有任何问题，可以正常访问**
-<img src="/video403_ok.png"/>
+<img src="/public/video403_ok.png"/>
 
 **而复制链接在新窗口直接打开，请求头中并不会携带 Referer**
 
-<img src="/video403-ok.png"/>
+<img src="/public/video403-ok.png"/>
 
 **我们打开控制台，可以看到在项目中打开，数据请求的请求头多了一个 Referer: `http://localhost:3000/**`
 
-<img src="/video403-no.png"/>
+<img src="/public/video403-no.png"/>
 
 ## 解决方法
 
