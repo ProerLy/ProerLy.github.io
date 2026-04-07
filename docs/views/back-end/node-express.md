@@ -695,3 +695,334 @@ async function getArticle(id) {
   return await Articles.findByPk(id);
 }
 ```
+
+# 8. 使用`bcrypt`进行密码加密
+
+1. 安装`bcrypt`
+
+```bash
+npm install bcrypt
+```
+
+2. 创建user模型文件
+
+```bash
+sequelize model:generate --name Users --attributes email:string,username:string,nickname:string,password:string,avatar:string,sex:tinyint,company:string,introduce:text,role:tinyint
+```
+
+3. 修改user模型文件，添加密码加密
+
+```javascript
+"use strict";
+const { Model } = require("sequelize");
+const bcrypt = require("bcrypt");
+
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+
+  User.init(
+    {
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "邮箱必须存在",
+          },
+          notEmpty: {
+            msg: "邮箱不能为空",
+          },
+          isEmail: {
+            msg: "邮箱格式不正确",
+          },
+          async isUnique(value) {
+            const user = await User.findOne({ where: { email: value } });
+            if (user) {
+              throw new Error("该邮箱已被注册");
+            }
+          },
+        },
+      },
+      username: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "用户名必须存在",
+          },
+          notEmpty: {
+            msg: "用户名不能为空",
+          },
+          len: {
+            args: [2, 30],
+            msg: "用户名长度必须在2-30个字符之间",
+          },
+          async isUnique(value) {
+            const user = await User.findOne({ where: { username: value } });
+            if (user) {
+              throw new Error("该用户名已被使用");
+            }
+          },
+        },
+      },
+      nickname: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "昵称必须存在",
+          },
+          notEmpty: {
+            msg: "昵称不能为空",
+          },
+          len: {
+            args: [1, 50],
+            msg: "昵称长度必须在1-50个字符之间",
+          },
+          async isUnique(value) {
+            const user = await User.findOne({ where: { nickname: value } });
+            if (user) {
+              throw new Error("该昵称已被使用");
+            }
+          },
+        },
+      },
+      password: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notNull: {
+            msg: "密码必须存在",
+          },
+          notEmpty: {
+            msg: "密码不能为空",
+          },
+          len: {
+            args: [6, 128],
+            msg: "密码长度必须在6-128个字符之间",
+          },
+        },
+        set(value) {
+          if (value.length >= 6 && value.length <= 128) {
+            const hashedPassword = bcrypt.hashSync(value, 10);
+            this.setDataValue("password", hashedPassword);
+          } else {
+            throw new Error("密码长度必须在6-128个字符之间");
+          }
+        },
+      },
+      avatar: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      sex: {
+        type: DataTypes.TINYINT.UNSIGNED,
+        allowNull: false,
+        defaultValue: 9,
+        validate: {
+          isIn: {
+            args: [["0", "1", "9"]],
+            msg: "性别值只能为 0（男）、1（女）或 9（未选择）",
+          },
+        },
+      },
+      company: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      introduce: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      role: {
+        type: DataTypes.TINYINT.UNSIGNED,
+        allowNull: false,
+        defaultValue: 0,
+        validate: {
+          isIn: {
+            args: [["0", "10"]],
+            msg: "角色值只能为 0（普通用户）或 10（管理员）",
+          },
+        },
+      },
+    },
+    {
+      sequelize,
+      modelName: "Users",
+      tableName: "Users", // 显式指定表名为复数形式
+      timestamps: true, // 自动生成 createdAt 和 updatedAt
+      indexes: [
+        {
+          unique: true,
+          fields: ["email"],
+        },
+        {
+          unique: true,
+          fields: ["username"],
+        },
+      ],
+    },
+  );
+
+  return User;
+};
+```
+
+- 在set方法中使用`bcrypt.hashSync`方法对密码进行加密，再设置到password字段中
+- 密码长度必须在6-128个字符之间
+
+4. 修改迁移文件
+
+```javascript
+"use strict";
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable("Users", {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER,
+      },
+      email: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      username: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      nickname: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      password: {
+        allowNull: false,
+        type: Sequelize.STRING,
+      },
+      avatar: {
+        type: Sequelize.STRING,
+      },
+      sex: {
+        allowNull: false,
+        type: Sequelize.TINYINT,
+      },
+      company: {
+        type: Sequelize.STRING,
+      },
+      introduce: {
+        type: Sequelize.TEXT,
+      },
+      role: {
+        allowNull: false,
+        type: Sequelize.TINYINT,
+      },
+      createdAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updatedAt: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+    });
+    await queryInterface.addIndex("Users", ["username"], {
+      unique: true,
+    });
+    await queryInterface.addIndex("Users", ["email"], {
+      unique: true,
+    });
+  },
+  async down(queryInterface, Sequelize) {
+    await queryInterface.dropTable("Users");
+  },
+};
+```
+
+5. 运行迁移文件
+
+```bash
+sequelize db:migrate
+```
+
+6. 创建用户种子文件
+
+```bash
+sequelize seed:generate --name users
+```
+
+7. 修改用户种子文件，添加密码加密
+
+```javascript
+"use strict";
+const bcrypt = require("bcrypt");
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    /**
+     * Add seed commands here.
+     *
+     * Example:
+     * await queryInterface.bulkInsert('People', [{
+     *   name: 'John Doe',
+     *   isBetaMember: false
+     * }], {});
+     */
+    const users = [
+      {
+        email: "admin@example.com",
+        username: "admin",
+        nickname: "管理员",
+        password: bcrypt.hashSync("123456", 10),
+        avatar:
+          "https://q8.itc.cn/q_70/images03/20250114/d9d8d1106f454c2b83ea395927bfc020.jpeg",
+        sex: 0,
+        role: 10,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        email: "user@example.com",
+        username: "user",
+        nickname: "普通用户",
+        password: bcrypt.hashSync("123456", 10),
+        avatar:
+          "https://q1.itc.cn/q_70/images03/20250701/afddfb3d5fcf459594cfa880445c9b2c.jpeg",
+        sex: 0,
+        role: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ];
+    await queryInterface.bulkInsert("Users", users);
+  },
+
+  async down(queryInterface, Sequelize) {
+    /**
+     * Add commands to revert seed here.
+     *
+     * Example:
+     * await queryInterface.bulkDelete('People', null, {});
+     */
+  },
+};
+```
+
+8. 运行种子文件
+
+```bash
+sequelize db:seed --seed xxxx-users
+```
+
+数据库中用户密码已加密：
+![alt text](image-31.png)
