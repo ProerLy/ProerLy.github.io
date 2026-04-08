@@ -15,7 +15,7 @@ export default defineConfig({
       {
         text: "前端",
         items: [
-          { text: "Js笔记", link: "/views/front-end/js" },
+          { text: "Js笔记（更新中……）", link: "/views/front-end/js" },
           { text: "vuex", link: "/views/front-end/vuex" },
           {
             text: "问题记录",
@@ -55,7 +55,10 @@ export default defineConfig({
     socialLinks: [
       { icon: "github", link: "https://github.com/vuejs/vitepress" },
     ],
-    outline: [1, 2, 3], // 只显示 h1 、 h2 和 h3 标题
+    outline: {
+      label: "文章大纲",
+      level: [2, 3, 4], // 显示 h2、h3 和 h4 标题
+    },
   },
   markdown: {
     lineNumbers: true, // 启用所有代码块的行号
