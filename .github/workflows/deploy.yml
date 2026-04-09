@@ -2,9 +2,9 @@
 name: Deploy to GitHub Pages
 
 on:
-  # 在 mine 分支有 push 或手动触发时运行
+  # 在 master 分支有 push 或手动触发时运行
   push:
-    branches: [mine]
+    branches: [master]
   workflow_dispatch:
 
 # 授予 GITHUB_TOKEN 权限
