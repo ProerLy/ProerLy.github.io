@@ -20,7 +20,7 @@ Axios 是一个基于 Promise 的 HTTP 客户端，可用于：
 
 ## 二、安装与引入
 
-1. 安装
+### 1. 安装
 
 ```bash
 
@@ -34,7 +34,7 @@ yarn add axios
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 ```
 
-2. 引入方式
+### 2. 引入方式
 
 ```javascript
 // ES6 模块
@@ -49,7 +49,7 @@ const axios = window.axios;
 
 ## 三、基本用法
 
-1. 通用请求方法
+### 1. 通用请求方法
 
 ```javascript
 // 最基础写法
@@ -65,7 +65,7 @@ axios({
   .catch((error) => console.error(error));
 ```
 
-2.  快捷方法（推荐）
+### 2. 快捷方法（推荐）
 
 ```javascript
 // GET
@@ -89,7 +89,7 @@ axios.head("/user");
 axios.options("/user");
 ```
 
-3. 使用 async/await（推荐）
+### 3. 使用 async/await（推荐）
 
 ```javascript
 async function fetchUser() {
@@ -198,7 +198,7 @@ axios.get("/user/12345").catch(function (error) {
 
 ## 六、高级功能
 
-1. 请求取消（推荐使用 AbortController）
+### 1. 请求取消（推荐使用 AbortController）
 
 ⚠️ 注意：CancelToken 已废弃，推荐使用 AbortController
 
@@ -235,7 +235,7 @@ axios.get("/user", {
 source.cancel("Operation canceled by the user.");
 ```
 
-2. 拦截器（Interceptors）
+### 2. 拦截器（Interceptors）
 
 **请求拦截器**
 
@@ -281,7 +281,7 @@ const myInterceptor = axios.interceptors.request.use(...);
 axios.interceptors.request.eject(myInterceptor);
 ```
 
-3. 创建实例（推荐用于项目封装）
+### 3. 创建实例（推荐用于项目封装）
 
 ```javascript
 // 创建实例
@@ -295,7 +295,7 @@ const instance = axios.create({
 instance.get("/user").then((res) => console.log(res));
 ```
 
-4. 并发请求
+### 4. 并发请求
 
 ```javascript
 function getUserAccount() {
@@ -322,7 +322,7 @@ Promise.all([getUserAccount(), getUserPermissions()]).then(([acct, perms]) => {
 
 ## 七、Vue 项目中的最佳实践（以 Vue 2 为例）
 
-1. 全局配置（main.js）
+### 1. 全局配置（main.js）
 
 ```javascript
 import Vue from "vue";
@@ -337,7 +337,7 @@ axios.defaults.baseURL = process.env.VUE_APP_API_BASE_URL;
 axios.defaults.timeout = 10000;
 ```
 
-2. 封装 API 模块（api/user.js）
+### 2. 封装 API 模块（api/user.js）
 
 ```javascript
 import axios from "axios";
@@ -358,7 +358,7 @@ export const userApi = {
 };
 ```
 
-3. 组件中使用
+### 3. 组件中使用
 
 ```javascript
 import { userApi } from "@/api/user";
@@ -375,7 +375,7 @@ export default {
 };
 ```
 
-4. 自动取消重复请求（防抖）
+### 4. 自动取消重复请求（防抖）
 
 ```javascript
 // request.js
@@ -422,7 +422,7 @@ axios.interceptors.response.use(
 
 ## 八、常见问题与解决方案
 
-Q1: 如何处理 Token 过期？
+### Q1: 如何处理 Token 过期？
 
 ```javascript
 // 响应拦截器中
@@ -445,7 +445,7 @@ axios.post("/upload", formData, {
 });
 ```
 
-Q3: 如何设置全局 loading？
+### Q3: 如何设置全局 loading？
 
 ```javascript
 let loadingCount = 0;
