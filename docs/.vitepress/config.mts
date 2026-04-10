@@ -52,6 +52,13 @@ export default defineConfig({
           },
         ],
       },
+      {
+        text: "git",
+        items: [
+          // { text: "git", link: "/views/git/git" },
+          { text: "git问题记录", link: "/views/git/git-example" },
+        ],
+      },
     ],
 
     socialLinks: [

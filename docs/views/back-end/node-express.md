@@ -1,4 +1,4 @@
-# 0. 项目中所用到的指令合计
+## 0. 项目中所用到的指令合计
 
 | 命令                                                                            | 说明                        |
 | :------------------------------------------------------------------------------ | :-------------------------- |
@@ -18,7 +18,7 @@
 | sequelize db:seed --seed xxx-articles                                           | 运行种子文件                |
 | sequelize db:seed:all                                                           | 运行所有种子文件            |
 
-# 1. 创建 express 项目
+## 1. 创建 express 项目
 
 运行以下命令创建项目
 
@@ -50,7 +50,7 @@ npm i
 
 ![alt text](image.png)
 
-# 2. 使用 nodemon 启动项目
+## 2. 使用 nodemon 启动项目
 
 我们在修改文件后往往都是需要重新启动项目的，这样很麻烦，我们可以使用 nodemon 启动项目，nodemon 是一个基于 node.js 的开发工具，它可以监听文件修改并自动重启项目。
 
@@ -82,9 +82,9 @@ npm install nodemon -g
 
 这样我们修改代码后只需要重新刷新页面即可
 
-# 3. 使用docker-desktop运行项目
+## 3. 使用docker-desktop运行项目
 
-## 在官网下载`docker-desktop`
+### 在官网下载`docker-desktop`
 
 - 下载地址：https://www.docker.com/products/docker-desktop/
 
@@ -96,7 +96,7 @@ npm install nodemon -g
 
 ![alt text](image-3.png)
 
-## 启动项目
+### 启动项目
 
 - 运行以下命令启动项目，使用以下指令启动项目，也可以在`docker desktop`中启动项目
 
@@ -106,7 +106,7 @@ docker compose up -d
 
 ![alt text](image-4.png)
 
-## 在启动docker-desktop所遇到的问题
+### 在启动docker-desktop所遇到的问题
 
 1. docker-desktop启动失败，双击启动后又退出，无法启动
 
@@ -140,7 +140,7 @@ Dism /online /enable-feature /featurename:Microsoft-Hyper-V-All /LimitA
 ccess /ALL
 ```
 
-## 配置阿里云的docker镜像，让访问更快
+### 配置阿里云的docker镜像，让访问更快
 
 - 打开设置
 
@@ -165,7 +165,7 @@ ccess /ALL
 
 ![alt text](image-28.png)
 
-# 4. 安装 sequelize
+## 4. 安装 sequelize
 
 1. 全局安装`sequelize-cli`
 
@@ -193,7 +193,7 @@ sequelize init
 
   ![alt text](image-8.png)
 
-## 项目文件解析
+### 项目文件解析
 
 - `config/config.json` 项目的配置文件，里面存放着不同环境下（development-开发环境、test-测试环境、production-生产环境）的数据库的配置信息，比如数据库的连接地址、用户名、密码、数据库名等等，需要把对应的配置信息填写进去。
 
@@ -205,7 +205,7 @@ sequelize init
 
 - `seeders` 文件夹存放着数据填充文件，比如初始化数据库数据等等。
 
-## 使用 sequelize
+### 使用 sequelize
 
 1. 使用以下命令创建一个模型文件（创建一个Articles模型文件，字段为title和content）：
 
@@ -253,9 +253,9 @@ sequelize db:seed --seed xxx-articles
 
 ![alt text](image-16.png)
 
-# 5. 实现增删改查接口
+## 5. 实现增删改查接口
 
-## 查询所有文章数据
+### 查询所有文章数据
 
 1. 在`routes` 目录下创建 `admin`文件夹，并在该文件夹下创建 `article.js` 文件，并添加以下代码：
 
@@ -305,7 +305,7 @@ app.use("/admin/articles", adminArticlesRouter);
 
 ![alt text](image-19.png)
 
-## 查询文章列表数据（分页）
+### 查询文章列表数据（分页）
 
 1. 在`routes` 目录下创建 `admin`文件夹，并在该文件夹下创建 `article.js` 文件，并添加以下代码：
 
@@ -334,7 +334,7 @@ router.get("/page", async function (req, res, next) {
 });
 ```
 
-## 查询文章详情
+### 查询文章详情
 
 1. 在`routes/admin/articles.js`文件中添加以下代码：
 
@@ -363,7 +363,7 @@ router.get("/:id", async function (req, res, next) {
 
 ![alt text](image-18.png)
 
-## 创建文章
+### 创建文章
 
 1. 在`routes/admin/articles.js`文件中添加以下代码：
 
@@ -391,7 +391,7 @@ router.post("/", async function (req, res, next) {
 
 ![alt text](image-20.png)
 
-## 修改文章
+### 修改文章
 
 1. 在`routes/admin/articles.js`文件中添加以下代码：
 
@@ -422,7 +422,7 @@ router.put("/", async function (req, res, next) {
 
 ![alt text](image-22.png)
 
-## 删除文章
+### 删除文章
 
 1. 在`routes/admin/articles.js`文件中添加以下代码：
 
@@ -454,7 +454,7 @@ router.delete("/:id", async function (req, res, next) {
 
 ![alt text](image-21.png)
 
-# 6. 验证表单数据
+## 6. 验证表单数据
 
 当我们在创建、修改、删除文章时，需要验证表单数据，比如标题和内容不能为空，否则会报错，如果判断十分多，if else 嵌套起来会很麻烦，并且可读性不高，那么我们可以在模型文件内容加入验证规则，如：
 
@@ -511,7 +511,7 @@ module.exports = (sequelize, DataTypes) => {
 
 ![alt text](image-30.png)
 
-# 7. 对增删改查操作进行代码优化，封装响应函数
+## 7. 对增删改查操作进行代码优化，封装响应函数
 
 1. 在根目录下件夹创建`utils`文件夹，并添加`response.js`文件，内容如下：
 
@@ -696,7 +696,7 @@ async function getArticle(id) {
 }
 ```
 
-# 8. 使用`bcrypt`进行密码加密
+## 8. 使用`bcrypt`进行密码加密
 
 1. 安装`bcrypt`
 
