@@ -17,6 +17,7 @@ export default defineConfig({
         items: [
           { text: "Js笔记（更新中……）", link: "/views/front-end/js" },
           { text: "vuex", link: "/views/front-end/vuex" },
+          { text: "axios", link: "/views/front-end/axios" },
           {
             text: "问题记录",
             items: [
@@ -27,6 +28,7 @@ export default defineConfig({
               { text: "vue2", link: "/views/front-end/vue2-example" },
               { text: "vue3", link: "/views/front-end/vue3-example" },
               { text: "vite", link: "/views/front-end/vite-example" },
+              { text: "axios", link: "/views/front-end/axios-example" },
             ],
           },
         ],
