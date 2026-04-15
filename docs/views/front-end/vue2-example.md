@@ -1,4 +1,4 @@
-# Vue2 项目打包文件放在服务器后，浏览器存在缓存问题的解决方案
+## Vue2 项目打包文件放在服务器后，浏览器存在缓存问题的解决方案
 
 - 使用版本控制
 
@@ -92,7 +92,132 @@ module.exports = {
 };
 ```
 
-# Vue2 项目打包时将 console.log()和 debugger 去除的方法
+## 解决在切换路由或加载页面时，出现加载js404的问题
+
+这个问题在 Vue 2 + Vue CLI 项目中很常见，主要原因是 前端路由与后端服务器配置不匹配 导致的。让我详细解释一下：
+
+### 🔍 问题根本原因
+
+1. Vue Router 的 History 模式问题
+   当你使用 vue-router 的 history 模式时：
+
+```javascript
+// router/index.js
+const router = new VueRouter({
+  mode: 'history', // 👈 这里是关键
+  routes: [...]
+})
+```
+
+正常情况下：访问 https://domain.com/ → 返回 index.html
+
+切换到其他页面：URL 变成 https://domain.com/product/detail
+
+但这个 URL 实际上并不存在于服务器上
+
+2. 静态资源缓存过期
+
+页面停留时间较长后，浏览器缓存的 JS/CSS 文件可能过期
+切换页面时，Vue 尝试加载新的 chunk 文件（如 js/chunk-xxxxx.js）
+如果这些文件名包含 hash，而服务器上文件已被更新或清理，就会 404
+
+3. 服务器未正确配置 fallback
+
+当用户直接访问 https://domain.com/product/detail 或刷新页面时：
+
+服务器会尝试找 /product/detail 这个物理路径
+找不到就返回 404
+
+正确做法应该是返回 index.html，让前端路由处理
+
+### ✅ 解决方案
+
+方案一：配置服务器 fallback（推荐）
+
+Nginx 配置：
+
+```nginx
+location / {
+  try_files $uri $uri/ /index.html;
+}
+```
+
+Apache 配置（.htaccess）：
+
+```apache
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+```
+
+Express.js 配置：
+
+```javascript
+const express = require("express");
+const app = express();
+
+// 静态文件服务
+app.use(express.static(path.join(__dirname, "dist")));
+
+// 所有其他请求都返回 index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+```
+
+### 方案二：改用 hash 模式（简单但 URL 不美观）
+
+```javascript
+const router = new VueRouter({
+  mode: 'hash', // URL 会变成 #/product/detail
+  routes: [...]
+})
+```
+
+### 方案三：优化构建配置（解决 chunk 404）
+
+在 vue.config.js 中配置：
+
+```javascript
+module.exports = {
+  // 确保所有资源都相对于根路径
+  publicPath: "/",
+
+  // 或者如果你部署在子目录
+  // publicPath: '/your-subdirectory/',
+
+  configureWebpack: {
+    output: {
+      // 确保 chunk 文件路径正确
+      publicPath: "/",
+    },
+  },
+};
+```
+
+### 方案四：添加错误处理和重试机制
+
+```javascript
+// router/index.js
+router.onError((error) => {
+  const pattern = /Loading chunk (\d)+ failed/g;
+  const isChunkLoadFailed = error.message.match(pattern);
+
+  if (isChunkLoadFailed) {
+    // 重新加载页面
+    window.location.reload();
+    // 或者显示友好的错误提示
+    // this.$message.error('页面资源加载失败，请刷新页面');
+  }
+});
+```
+
+## Vue2 项目打包时将 console.log()和 debugger 去除的方法
 
 在 `vue.config.js` 中使用`terser-webpack-plugin` 的配置项：
 
